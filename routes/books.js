@@ -1,16 +1,51 @@
 const express = require("express");
+const dotenv = require("dotenv");
 const bookList = require("../books_list.json");
 const BookRouter = express.Router();
 const pool = require("../userModel");
-
+const table = process.env.table;
 
 BookRouter.get("/", (req, res) => {
-  pool.query("Select * from books", (error, results) => {
+  pool.query(`SELECT * FROM ${table} `, (error, results) => {
     if (error) {
       throw error;
+    } else {
+      res.status(200).json(results.rows);
     }
-    res.status(200).json(results.rows);
   });
+});
+
+//want to try how to get the info according to not only id, but also maybe author name.
+
+BookRouter.get("/:id", (req, res) => {
+  const { id } = req.params;
+  pool.query(`SELECT * FROM ${table} WHERE id = $1`, [id], (error, results) => {
+    if (error) {
+      throw error;
+    } else {
+      res.status(200).json(results.rows);
+    }
+  });
+});
+
+BookRouter.post("/", (res, req) => {
+  const { id, name, author } = req.body;
+
+  if (!book) {
+    return res
+      .status(400)
+      .json({ success: "false", message: "Please provide the book name" });
+  } else {
+    pool.query(
+      `INSERT INTO ${table} (id, name, author) VALUES ($1, $2, $3) RETURNING *`,
+      [id, name, author],
+      (error, results) => {
+        if (error) {
+          throw error;
+        } else res.status(200).json(results.rows);
+      }
+    );
+  }
 });
 
 module.exports = BookRouter;
