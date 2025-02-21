@@ -65,12 +65,31 @@ BookRouter.put("/:id", (req, res) => {
       (error, results) => {
         if (error) {
           throw error;
+        } else if (results.rowCount === 0) {
+          res
+            .status(404)
+            .json({ success: "false", message: "Enter an appropriate id" });
         } else {
-          res.status(200).json(results.rows);
+          res.status(200).json({ success: "true", data: results.rows });
         }
       }
     );
   }
+});
+
+BookRouter.delete("/:id", (req, res) => {
+  const { id } = req.params;
+  pool.query(`DELETE FROM ${table} WHERE id = $1`, [id], (error, results) => {
+    if (error) {
+      throw error;
+    } else if (results.rowCount === 0) {
+      res
+        .status(400)
+        .json({ success: "false", message: "Enter an appropraite id" });
+    } else {
+      res.status(200).json({ success: "true", message: "succesfully deleted" });
+    }
+  });
 });
 
 module.exports = BookRouter;
