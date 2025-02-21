@@ -42,7 +42,32 @@ BookRouter.post("/", (req, res) => {
       (error, results) => {
         if (error) {
           throw error;
-        } else res.status(200).json(results.rows);
+        } else {
+          res.status(200).json(results.rows);
+        }
+      }
+    );
+  }
+});
+
+BookRouter.put("/:id", (req, res) => {
+  const { id } = req.params;
+  const { name, author } = req.body;
+
+  if (!name) {
+    return res
+      .status(400)
+      .json({ success: "false", message: "Please provide the book name" });
+  } else {
+    pool.query(
+      `UPDATE ${table} SET name = $1, author = $2 WHERE id = $3 RETURNING *`,
+      [name, author, id],
+      (error, results) => {
+        if (error) {
+          throw error;
+        } else {
+          res.status(200).json(results.rows);
+        }
       }
     );
   }
