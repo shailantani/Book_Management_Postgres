@@ -28,10 +28,10 @@ BookRouter.get("/:id", (req, res) => {
   });
 });
 
-BookRouter.post("/", (res, req) => {
+BookRouter.post("/", (req, res) => {
   const { id, name, author } = req.body;
 
-  if (!book) {
+  if (!name) {
     return res
       .status(400)
       .json({ success: "false", message: "Please provide the book name" });
